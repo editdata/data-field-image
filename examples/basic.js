@@ -1,24 +1,30 @@
 var vraf = require('virtual-raf')
 var h = require('virtual-dom/h')
-var stringField = require('../index')
+var createField = require('../index')
+
+function inputField (state) {
+  var field = createField()
+
+  field.on('update', function (e, value) {
+    tree.update({ imageURL: value })
+  })
+
+  return field.render(h, { value: state.imageURL })
+}
+
+function displayField (state) {
+  var field = createField({
+    display: true
+  })
+
+  return field.render(h, { value: state.imageURL })
+}
 
 function render (state) {
-  var elements = []
-
-  elements.push(stringField(h, {
-    value: state.imageURL,
-    oninput: function (e) {
-      tree.update({ imageURL: e.target.value })
-    }
-  }))
-
-  elements.push(stringField(h, {
-    display: true,
-    value: state.imageURL,
-    onclick: function (e) { console.log('display', e.target.value) }
-  }))
-
-  return h('div.fields', elements)
+  return h('div.fields', [
+    inputField(state),
+    displayField(state)
+  ])
 }
 
 var tree = vraf({ imageURL: 'http://placehold.it/50x50' }, render, require('virtual-dom'))
